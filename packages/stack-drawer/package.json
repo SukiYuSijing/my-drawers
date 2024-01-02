@@ -4,6 +4,7 @@
   "private": false,
   "description": "层叠抽屉",
   "type": "module",
+  "homepage": "https://github.com/SukiYuSijing/select-multi-tags.git",
   "exports": {
     ".": {
       "import": "./dist/my-lib.es.js"
