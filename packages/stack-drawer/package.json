@@ -29,9 +29,5 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vue-tsc": "^1.8.25"
-  },
-  "dependencies": {
-    "example": "workspace:^",
-    "stack-drawer": "workspace:^"
   }
 }
