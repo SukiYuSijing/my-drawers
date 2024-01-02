@@ -1,10 +1,10 @@
 {
   "name": "stack-drawer",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": false,
   "description": "层叠抽屉",
   "type": "module",
-  "homepage": "https://github.com/SukiYuSijing/select-multi-tags.git",
+  "homepage": "https://github.com/SukiYuSijing/stack-drawer.git",
   "exports": {
     ".": {
       "import": "./dist/my-lib.es.js"
