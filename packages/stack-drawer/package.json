@@ -1,6 +1,6 @@
 {
   "name": "stack-drawer",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": false,
   "description": "层叠抽屉",
   "type": "module",
