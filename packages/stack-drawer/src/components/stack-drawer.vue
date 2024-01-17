@@ -4,6 +4,7 @@
     v-bind="attrs"
     :class="[props.class, $style['stackDrawer'], timestamp + '-drawer-id']"
     :modal-class="`${props.modalClass}, ${$style['stackDrawer-modal-class']}`"
+    :before-close="beforeClose"
   >
     <template #header="header">
       <component :is="$slots.header" v-bind="header" />
@@ -16,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, ref, useAttrs, watch } from 'vue';
+import { nextTick, onBeforeUnmount, ref, useAttrs, watch } from 'vue';
 import { ElDrawer } from 'element-plus';
 import 'element-plus/theme-chalk/el-drawer.css';
 import 'element-plus/theme-chalk/base.css';
@@ -45,6 +46,11 @@ const props = defineProps({
 const attrs = useAttrs();
 let existingDrawersQty = 0;
 const closeHandler = (event: MouseEvent) => {
+  const flag = storeDrawer.state.stackDrawer.flag;
+  if (flag) {
+    storeDrawer.commit('setFlag', false);
+    return;
+  }
   const existingDrawers = storeDrawer.state.stackDrawer.existingDrawers;
   existingDrawersQty = existingDrawers?.length;
   storeDrawer.commit('setQty', existingDrawersQty);
@@ -60,9 +66,10 @@ const closeHandler = (event: MouseEvent) => {
     }
   }
 
-  const index = existingDrawers.findIndex((drawerRef: any) => {
+  let index = existingDrawers.findIndex((drawerRef: any) => {
     return drawerRef.value && drawerRef.value.drawerRef === offsetParent;
   });
+  storeDrawer.commit('setIndex', index);
   while (existingDrawers.length > index + 1) {
     const ref = existingDrawers.pop();
     ref?.value?.handleClose();
@@ -87,7 +94,7 @@ watch(
 onBeforeUnmount(async () => {
   const existingDrawers = storeDrawer?.state?.stackDrawer?.existingDrawers;
   if (existingDrawers) {
-    const index = (existingDrawers && existingDrawers.indexOf(drawerRef)) || -1;
+    let index = (existingDrawers && existingDrawers.indexOf(drawerRef)) || -1;
     while (existingDrawers.length > index + 1) {
       const ref = existingDrawers.pop();
       ref?.value?.handleClose();
@@ -98,23 +105,28 @@ onBeforeUnmount(async () => {
   }
 });
 async function beforeClose(done: () => void) {
-  // const doneCallbacks = storeDrawer?.state?.stackDrawer?.doneCallbacks;
-  // const existingDrawersQty =
-  //   storeDrawer?.state?.stackDrawer?.existingDrawersQty;
-  // if (props.beforeClose && doneCallbacks?.length < existingDrawersQty - 1) {
-  //   storeDrawer.commit('pushExistingDone', done);
-  // } else {
-  //   storeDrawer.commit('pushExistingDone', done);
-  //   const done1 = () =>
-  //     new Promise((resolve) => {
-  //       done();
-  //       doneCallbacks.forEach((doneCallback) => {
-  //         doneCallback();
-  //       });
-  //       storeDrawer.commit('pushExistingDone');
-  //     });
-  //   props.beforeClose?.(done1);
-  // }
+  storeDrawer.commit('setFlag', true);
+  const doneCallbacks = storeDrawer?.state?.stackDrawer?.doneCallbacks;
+  const existingDrawersQty =
+    storeDrawer?.state?.stackDrawer?.existingDrawersQty;
+  const index = storeDrawer?.state?.stackDrawer?.index;
+  if (doneCallbacks?.length + (index + 1) < existingDrawersQty - 1) {
+    storeDrawer.commit('pushExistingDone', done);
+  } else {
+    storeDrawer.commit('pushExistingDone', done);
+    const done1 = () =>
+      new Promise((resolve) => {
+        done();
+        doneCallbacks.forEach((doneCallback) => {
+          doneCallback();
+        });
+        storeDrawer.commit('pushExistingDone');
+      }).finally(() => {
+        storeDrawer.commit('setFlag', false);
+      });
+    const cancelCallback = () => {};
+    props.beforeClose?.(done1, cancelCallback);
+  }
 }
 </script>
 

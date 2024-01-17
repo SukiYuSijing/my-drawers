@@ -7,7 +7,9 @@ const obj = {
   state: {
     existingDrawers: [],
     doneCallbacks: [],
-    existingDrawersQty: 0
+    existingDrawersQty: 0,
+    index: 0,
+    flag:false
   },
   mutations: {
     pushExistingDrawers: (
@@ -30,6 +32,18 @@ const obj = {
       existingDrawersQty: number
     ) => {
       state.existingDrawersQty = existingDrawersQty
+    },
+    setIndex: (
+      state: Record<string, any>,
+      index: number
+    ) => {
+      state.index = index
+    },
+    setFlag: (
+      state: Record<string, any>,
+      flag: number
+    ) => {
+      state.flag = flag
     },
   },
 }
