@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "element-plus": "^2.4.4",
+    "lodash-es": "^4.17.21",
     "stack-drawer": "workspace:^",
-    "vue": "^3.3.11"
+    "vue": "^3.3.11",
+    "vue-router": "4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",
