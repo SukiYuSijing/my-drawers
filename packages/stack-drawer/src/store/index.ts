@@ -6,19 +6,30 @@ export const storeDrawer: Store<Record<string, any>> = createStore({})
 const obj = {
   state: {
     existingDrawers: [],
+    doneCallbacks: [],
+    existingDrawersQty: 0
   },
   mutations: {
     pushExistingDrawers: (
-      state: Record<string, Ref<Component | null>[]>,
+      state: Record<string, any>[],
       val: Ref<Component | null>
     ) => {
       state.existingDrawers.push(val)
     },
-    setExistingDrawers: (
-      state: Record<string, Ref<Component | null>[]>,
-      val: Ref<Component | null>[]
+    pushExistingDone: (
+      state: Record<string, any>,
+      done: () => void | undefined
     ) => {
-      if (Array.isArray(val)) state.existingDrawers = val
+      if (done) state.doneCallbacks.push(done)
+      else {
+        state.doneCallbacks.length = 0
+      }
+    },
+    setQty: (
+      state: Record<string, any>,
+      existingDrawersQty: number
+    ) => {
+      state.existingDrawersQty = existingDrawersQty
     },
   },
 }
