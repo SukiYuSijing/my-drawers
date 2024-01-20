@@ -1,25 +1,36 @@
 import { createStore } from 'vuex'
 import type { Component, Ref } from 'vue'
 import type { Store } from 'vuex'
-
+type IObj = {
+  // 当前打开抽屉的个数
+  existingDrawers: Ref<Component | null>[],
+  // beforeClose的回调方法，需要执行几个
+  doneCallbacks: (() => void)[],
+  // 存在的抽屉数量
+  existingDrawersQty: number,
+  // 在第几个抽屉点击关闭
+  clickIndex: number,
+  // 需不需要响应关闭抽屉的事件
+  shouldExecute: boolean
+}
 export const storeDrawer: Store<Record<string, any>> = createStore({})
 const obj = {
   state: {
     existingDrawers: [],
     doneCallbacks: [],
     existingDrawersQty: 0,
-    index: 0,
-    flag:false
-  },
+    clickIndex: 0,
+    shouldExecute: false
+  } as IObj,
   mutations: {
     pushExistingDrawers: (
-      state: Record<string, any>[],
+      state: IObj,
       val: Ref<Component | null>
     ) => {
       state.existingDrawers.push(val)
     },
     pushExistingDone: (
-      state: Record<string, any>,
+      state: IObj,
       done: () => void | undefined
     ) => {
       if (done) state.doneCallbacks.push(done)
@@ -28,22 +39,22 @@ const obj = {
       }
     },
     setQty: (
-      state: Record<string, any>,
+      state: IObj,
       existingDrawersQty: number
     ) => {
       state.existingDrawersQty = existingDrawersQty
     },
     setIndex: (
-      state: Record<string, any>,
-      index: number
+      state: IObj,
+      clickIndex: number
     ) => {
-      state.index = index
+      state.clickIndex = clickIndex
     },
     setFlag: (
-      state: Record<string, any>,
-      flag: number
+      state: IObj,
+      shouldExecute: boolean
     ) => {
-      state.flag = flag
+      state.shouldExecute = shouldExecute
     },
   },
 }
@@ -52,5 +63,5 @@ export function storeRegisterModule(name: string) {
 }
 
 export function storeUnregisterModule(name: string) {
-  storeDrawer.unregisterModule(name, obj)
+  storeDrawer.unregisterModule(name)
 }

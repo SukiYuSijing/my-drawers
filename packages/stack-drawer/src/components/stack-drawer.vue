@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, ref, useAttrs, watch } from 'vue';
+import { onBeforeUnmount, ref, useAttrs, watch } from 'vue';
 import { ElDrawer } from 'element-plus';
 import 'element-plus/theme-chalk/el-drawer.css';
 import 'element-plus/theme-chalk/base.css';
@@ -46,8 +46,8 @@ const props = defineProps({
 const attrs = useAttrs();
 let existingDrawersQty = 0;
 const closeHandler = (event: MouseEvent) => {
-  const flag = storeDrawer.state.stackDrawer.flag;
-  if (flag) {
+  const shouldExecute = storeDrawer.state.stackDrawer.shouldExecute;
+  if (shouldExecute) {
     storeDrawer.commit('setFlag', false);
     return;
   }
@@ -109,16 +109,16 @@ async function beforeClose(done: () => void) {
   const doneCallbacks = storeDrawer?.state?.stackDrawer?.doneCallbacks;
   const existingDrawersQty =
     storeDrawer?.state?.stackDrawer?.existingDrawersQty;
-  const index = storeDrawer?.state?.stackDrawer?.index;
+  const index = storeDrawer?.state?.stackDrawer?.clickIndex;
   if (doneCallbacks?.length + (index + 1) < existingDrawersQty - 1) {
     storeDrawer.commit('pushExistingDone', done);
   } else {
     storeDrawer.commit('pushExistingDone', done);
     const done1 = () =>
-      new Promise((resolve) => {
+      new Promise(() => {
         done();
-        doneCallbacks.forEach((doneCallback) => {
-          doneCallback();
+        doneCallbacks.forEach((doneCallback: unknown) => {
+          if (typeof doneCallback === 'function') doneCallback();
         });
         storeDrawer.commit('pushExistingDone');
       }).finally(() => {
